@@ -1,0 +1,62 @@
+In your discussion.txt file, answer all of the following questions:
+
+    (1) What happens if you call md for an address that does not correspond to a physical memory
+        address? 
+            It will throw Segemention fault. Segemention fault occurs when user is trying to access 
+            a memory that they are not supposed to or is not there. For example, md 10000 will throw
+            Segemention fault in Tutor. However, it is returning "05 00 c0 07 ....." in SAPC. 
+            
+            What if you write to an address that's part of your tutor code? 
+
+            LINUX will return the value at the usyms address if you call one of address in usyms.
+            SAPC will return the value at the syms address if you call one of address in syms.
+
+            LINUX and SAPC will return same value.
+
+
+    (2) Read the makefile to see where it puts the symbol table (nm output) for your tutor code. Use
+        that symbol table to figure out:
+        (a) the address for test global variable xyz, which has value 6. Use tutor with that address
+            to verify the value in memory.
+
+            The address for the test global variable xyz is 0804c040. md 0804c040 returns 6 for both
+            hexadecimal and ascii value.
+
+        (b) the address of the pointer variable pxyz. Find the value of pxyz in memory.
+
+            The address of the pointer variable pxyz is 0804c09c. The value of pxyz is "40 c0 04 08". 
+            Since it's in little endian form, "40 c0 04 08" represents "08 04 c0 40".
+
+        (c) the address of the cmds array. Use this address to determine the very first pointer in the
+            array, the string pointer to "md". Then find the 'm' and 'd' and terminating null of this
+            string.
+            
+            The address of the cmds is 0804c060. cmds points to "42 a0 04 08" which is "0804a042". If we
+            look at the value of 0804a042, it returns "6d 64 00", which is "m" "d" "null".
+
+
+        (d) change the stop command from 's' to 'x' while the tutor program is running. Can you
+            change the tutor prompt the same way?
+
+            Yes you can change s to x by using "ms 101cc6 78". You can change tutor prompt the same way 
+            by "ms 101ca2 55". This should change the PC-Tutor>.
+            
+    (3) Read the nm output to determine where in memory the code resides, on SAPC and LINUX.
+    Hint: code symbols are marked t or T. Similarly determine where the data (set of variables)
+    resides.
+
+        In usyms(LINUX), T would be in address between, main and _start (08049080 and 0804963d).
+        In syms(SAPC), T would be in address between, _start and _prtl2 (00100100 and 00101bf4).
+
+    (4) Try to change the code itself so that tutor crashes (any random change that actually takes
+        effect should do this). What happens on SAPC? on LINUX?
+
+        In LINUX, it returned Segemention Fault (core dump) and exited Tutor.
+        Similarly, in SAPC, it returns "Exception 14 at ....: Page fault".
+
+    (5) You can't find the program stack using the nm output, but you can find it by looking at the
+        stack pointer, called %esp on the SAPC and LINUX. Record your observations. Use "i reg" (info
+        on registers) to see %esp in gdb and "rd" to see registers in Tutor.
+
+        For tutor, I did "md 100100" and called "i reg". In esp it returned, "esp 0xffffdaf0 0xffffdaf0".
+        For SAPC, I called "rd" and returned "ESP=003fff20" for esp.
